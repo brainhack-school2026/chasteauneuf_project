@@ -1,0 +1,14 @@
+# data fMRI and images
+dataset/images/
+dataset/unlabled/
+
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+*.egg-info/
+.env
+
+# OS
+.DS_Store
+Thumbs.db
