@@ -1,6 +1,10 @@
 # data fMRI and images
+dataset/fMRI/
 dataset/images/
 dataset/unlabled/
+
+#models
+mdoels/
 
 # Python
 __pycache__/
