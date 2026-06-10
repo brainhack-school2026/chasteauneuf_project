@@ -4,7 +4,7 @@ dataset/images/
 dataset/unlabled/
 
 #models
-
+models/
 
 # Python
 __pycache__/
