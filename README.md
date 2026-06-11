@@ -136,11 +136,11 @@ The results of three models trained on the main pipeline are available in the re
 
 The following histrograms (available at results/nway_accuracy/{model_name}_decoder_nway_accuracy.png) show the 2-way, 5-way, 10-way accuracy of the three models compared to the results reported in the Beliy et al. paper and to chance.
 
-![N-way accuracy](results/nway_accuracy/model_full_self_supervised_decoder_nway.png)
-
-![N-way accuracy](results/nway_accuracy/model_image_self_supervised_decoder_nway.png)
-
-![N-way accuracy](results/nway_accuracy/model_only_supervised_decoder_nway.png)
+<p float="left">
+  <img src="(results/nway_accuracy/model_full_self_supervised_decoder_nway.png)" width="450"/>
+  <img src="results/nway_accuracy/model_full_self_supervised_decoder_nway.png" width="450"/>
+  <img src="results/nway_accuracy/model_only_supervised_decoder_nway.png" width="450"/>
+</p>
 
 The obtained results are significantly above chance, which shows the ability of the architecture to reconstuct recognisable features, though it does not reach the Beliy et al. performances.
 
@@ -175,6 +175,18 @@ The fMRI signals for the test set are averaged across the 35 repetitions during 
 
 During training, the L_DE loss does not decrease as expected, indicating that the model strugles to learn from the few fMRI signals.
 
-![Losses](docs/losses.png)
+<img src="docs/losses.png" width="450"/>
 
 This is why, for all following models, the coefficients for self-supervised models are set to (lambda_d = 1, lambda_ed = 1, lambda_de = 0.05)
+
+### ROI experiment : which brain regions carry reconstruction-relevant information?
+
+This part focuses on the experiment conducted in the **Experiment_ROI.ipynb** notebook. The structure of the main pipeline is applied to datasets where reduced to subsets of voxels corresponding to different parts of the visual cortex.
+
+Labels for each voxel are provided, which anables to construct the following masks:
+
+![ROI masks](docs/ROI_masks.png)
+
+Corresponding parts of the brain (figure obtained with nilearn):
+
+![ROI](docs/roi_brain_localisation.png)
