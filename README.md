@@ -127,7 +127,7 @@ results/
     roi_experiment/                 ROI comparison plots
     data_size_experiment/           Supervised vs self-supervised comparison
 ```
-
+---
 ### Main pipeline
 The results of three models trained on the main pipeline are available in the results/ folder:
 - **model_full_self_supervised**: (trained with lambda_d = 1, lambda_de = 1, lambda_ed = 1)
@@ -137,9 +137,9 @@ The results of three models trained on the main pipeline are available in the re
 The following histrograms (available at results/nway_accuracy/{model_name}_decoder_nway_accuracy.png) show the 2-way, 5-way, 10-way accuracy of the three models compared to the results reported in the Beliy et al. paper and to chance.
 
 <p float="left">
-  <img src="(results/nway_accuracy/model_full_self_supervised_decoder_nway.png)" width="450"/>
-  <img src="results/nway_accuracy/model_full_self_supervised_decoder_nway.png" width="450"/>
-  <img src="results/nway_accuracy/model_only_supervised_decoder_nway.png" width="450"/>
+  <img src="results/nway_accuracy/model_full_self_supervised_decoder_nway.png" width="250"/>
+  <img src="results/nway_accuracy/model_image_self_supervised_decoder_nway.png" width="250"/>
+  <img src="results/nway_accuracy/model_only_supervised_decoder_nway.png" width="250"/>
 </p>
 
 The obtained results are significantly above chance, which shows the ability of the architecture to reconstuct recognisable features, though it does not reach the Beliy et al. performances.
@@ -157,6 +157,7 @@ Other metrics (SSIM, Pixel Correlation, CLIP similarity) were computed and can b
 
 Metrics are quite close for the three models though the only_supervised model seems to obtain a bit lower results, which would show the use of self-supervision. More in-depth study is conducted in the dataset size experiment. 
 
+---
 #### Reconstructions:
 
 All reconstruction for each trained model can be found under results/**reconstruction/{model_name}_decoder/all50.png**
@@ -165,12 +166,14 @@ All reconstruction for each trained model can be found under results/**reconstru
 
 Best reconstructions capture global color and shape though details are lost. However some reconstruction stray very far away from their ground truth (often due to lack of contrast or image complexity).
 
+---
 #### SNR analysis:
 
 The fMRI signals for the test set are averaged across the 35 repetitions during acquisition, producing signals with a higher SNR. The following graph shows the evolution of reconstruction quality depending on the number of raw signals used for averaging:
 
-![SNR curve](results/snr_curves/model_full_self_supervised_decoder_snr.png)
+<img src="results/snr_curves/model_full_self_supervised_decoder_snr.png" width="350"/>
 
+---
 #### The Decoder-Encoder loss
 
 During training, the L_DE loss does not decrease as expected, indicating that the model strugles to learn from the few fMRI signals.
@@ -179,14 +182,49 @@ During training, the L_DE loss does not decrease as expected, indicating that th
 
 This is why, for all following models, the coefficients for self-supervised models are set to (lambda_d = 1, lambda_ed = 1, lambda_de = 0.05)
 
+---
+
 ### ROI experiment : which brain regions carry reconstruction-relevant information?
 
-This part focuses on the experiment conducted in the **Experiment_ROI.ipynb** notebook. The structure of the main pipeline is applied to datasets where reduced to subsets of voxels corresponding to different parts of the visual cortex.
+This part focuses on the experiment conducted in the **Experiment_ROI.ipynb** notebook. The structure of the main pipeline is applied to train region specific models. Each model is trained on a reduced subsets of voxels corresponding to different parts of the visual cortex.
 
-Labels for each voxel are provided, which anables to construct the following masks:
+Labels for each voxel are provided, which anables to construct the following masks (dark parts correspond to the removed voxels):
 
 ![ROI masks](docs/ROI_masks.png)
 
 Corresponding parts of the brain (figure obtained with nilearn):
 
-![ROI](docs/roi_brain_localisation.png)
+<img src="docs/roi_brain_localisation.png" width="350"/>
+
+#### Reconstructions :
+Reconstructions obtained for each part of the visual cortex can be found under the name **reconstructions_ROI_{roi_name}.png**
+
+#### Performances :
+
+![ROI comparison](results/roi_experiment/roi_combined_metrics.png)
+![ROI comparison](results/roi_experiment/roi_combined_metrics2.png)
+
+Observations:
+Regions dedicated to low level features tend to perform better than those dedicated to higher ones.
+ V1 (1004 voxels, 2-way=74%) and V2 (1018 voxels, 74%) match or exceed the full visual cortex (4466 voxels, 71%). This suggests that the low-level areas carry sufficient information for this reconstruction approach, and that adding higher-level areas does not help (possibly because the additional voxels introduce noise that is hard to handle with only 1200 training pairs).
+
+CLIP similarity is remarkably uniform across all ROIs, indicating that high-level semantic content is probably absent from the reconstructed images.
+
+#### Low visual cortex vs high visual cortex:
+
+![LVC/HVC comparison](docs/LVC_HVC_comparison.png)
+
+Images reconstructed from HVC tend to show less precise features and shapes, only global color. On the other hand images reconstrcuted from LVC are sometimes even more precise than with the full visual cortex, showing more details and better defined objects.
+
+---
+### Dataset size experiment: how much does self-supervision help when data becomes even scarcer ?
+
+This experiment is conducted in **dataset_size_experiment.ipynb**
+
+This time, models are trained on three different dataset sizes (600, 800 and 1000). fMRI/image pairs are randomly chosen among the initial dataset. For each size, a **self-supervised** model (lambda_d = **1**, lambda_ed = **1**, lambda_de = **0.05**) and a **supervised-only** model (lambda_d = **1**, lambda_ed = **0**, lambda_de = **0**) are trained and compared.
+
+![exp datasize](results/data_size_experiment/datasize_supervised_vs_selfsupervised.png)
+
+Even if the difference of obtained score isn't always impressive, the models that are trained with self-supervision consistently obtain better results than the models without. This shows that self-supervision is an effective way to compensate for data scarcity. Notably, the self-supervised 2-way accuracy decrease is slower than the only supervised one.
+
+![example](docs/ss_vs_os_example.png)
