@@ -144,10 +144,37 @@ The following histrograms (available at results/nway_accuracy/{model_name}_decod
 
 The obtained results are significantly above chance, which shows the ability of the architecture to reconstuct recognisable features, though it does not reach the Beliy et al. performances.
 
-Reconstructions
+It is important to note that 2-way accuracy is quite variable accross trials for the same model (up to +- 3%)
 
-SNR
+Other metrics (SSIM, Pixel Correlation, CLIP similarity) were computed and can be found for each model under **results/other_metrics/metrics_{model_name}.png**
 
-Losses
+| Metric | full_self_supervised | image_self_supervised | only_supervised |
+|--------|-------|--------------|--------|
+| PixCorr | 0.271 | 0.270 | 0.265 |
+| SSIM | 0.249 | 0.246 | 0.247 |
+| CLIP similarity | 0.535 | 0.535 | 0.533 |
+| 2-way accuracy | 70.6% | 74.5% | 71.7% |
 
-which is why, for all following models, the coefficients for self-supervised models will be (lambda_d = 1, lambda_ed = 1, lambda_de = 0.05)
+Metrics are quite close for the three models though the only_supervised model seems to obtain a bit lower results, which would show the use of self-supervision. More in-depth study is conducted in the dataset size experiment. 
+
+#### Reconstructions:
+
+All reconstruction for each trained model can be found under results/**reconstruction/{model_name}_decoder/all50.png**
+
+![All 50 reconstructions](results/reconstructions/model_full_self_supervised_decoder_all50.png)
+
+Best reconstructions capture global color and shape though details are lost. However some reconstruction stray very far away from their ground truth (often due to lack of contrast or image complexity).
+
+#### SNR analysis:
+
+The fMRI signals for the test set are averaged across the 35 repetitions during acquisition, producing signals with a higher SNR. The following graph shows the evolution of reconstruction quality depending on the number of raw signals used for averaging:
+
+![SNR curve](results/snr_curves/model_full_self_supervised_decoder_snr.png)
+
+#### The Decoder-Encoder loss
+
+During training, the L_DE loss does not decrease as expected, indicating that the model strugles to learn from the few fMRI signals.
+
+![Losses](docs/losses.png)
+
+This is why, for all following models, the coefficients for self-supervised models are set to (lambda_d = 1, lambda_ed = 1, lambda_de = 0.05)
