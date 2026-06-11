@@ -53,12 +53,12 @@ Stimuli images are not directly provided with the dataset but can be asked with 
 
 ## Deliverables
 
-- **fmri_to_image_pipeline.ipynb** : Notebook with whole pipeline step by step
+- `fmri_to_image_pipeline.ipynb` : Notebook with whole pipeline step by step
    - Step 1 : dataset downloading and creation of training and testing pairs
    - Step 2 : Encoder + Decoder implementation and training
    - Step 3 : Evaluation
-- **Experiment_ROI.ipynb**: Notebook using the pipeline to train and compare models on different parts of the visual cortex
-- **experiment_dataset_size.ipynb**: Notebook using the pipeline to train and compare supervised-only vs self-supervised methods on different dataset sizes
+- `Experiment_ROI.ipynb`: Notebook using the pipeline to train and compare models on different parts of the visual cortex
+- `experiment_dataset_size.ipynb`: Notebook using the pipeline to train and compare supervised-only vs self-supervised methods on different dataset sizes
 
 
 - Results: image reconstructions, metrics and comparison in the results/ folder (how each results was obtained and by which model is decribed in the **Results** part of this report)
@@ -130,9 +130,9 @@ results/
 ---
 ### Main pipeline
 The results of three models trained on the main pipeline are available in the results/ folder:
-- **model_full_self_supervised**: (trained with lambda_d = 1, lambda_de = 1, lambda_ed = 1)
-- **model_image_self_supervised**: (trained with lambda_d = 1, lambda_ed = 1, lambda_de = 0)
-- **model_only_supervised**: (trained with lambda_d = 1, lambda_ed = 0, lambda_de = 0)
+- `model_full_self_supervised`: (trained with lambda_d = 1, lambda_de = 1, lambda_ed = 1)
+- `model_image_self_supervised`: (trained with lambda_d = 1, lambda_ed = 1, lambda_de = 0)
+- `model_only_supervised`: (trained with lambda_d = 1, lambda_ed = 0, lambda_de = 0)
 
 The following histrograms (available at results/nway_accuracy/{model_name}_decoder_nway_accuracy.png) show the 2-way, 5-way, 10-way accuracy of the three models compared to the results reported in the Beliy et al. paper and to chance.
 
@@ -146,7 +146,7 @@ The obtained results are significantly above chance, which shows the ability of 
 
 It is important to note that 2-way accuracy is quite variable accross trials for the same model (up to +- 3%)
 
-Other metrics (SSIM, Pixel Correlation, CLIP similarity) were computed and can be found for each model under **results/other_metrics/metrics_{model_name}.png**
+Other metrics (SSIM, Pixel Correlation, CLIP similarity) were computed and can be found for each model under `results/other_metrics/metrics_{model_name}.png`
 
 | Metric | full_self_supervised | image_self_supervised | only_supervised |
 |--------|-------|--------------|--------|
@@ -160,7 +160,7 @@ Metrics are quite close for the three models though the only_supervised model se
 ---
 #### Reconstructions:
 
-All reconstruction for each trained model can be found under results/**reconstruction/{model_name}_decoder/all50.png**
+All reconstruction for each trained model can be found under `results/reconstruction/{model_name}_decoder/all50.png`
 
 ![All 50 reconstructions](results/reconstructions/model_full_self_supervised_decoder_all50.png)
 
@@ -186,7 +186,7 @@ This is why, for all following models, the coefficients for self-supervised mode
 
 ### ROI experiment : which brain regions carry reconstruction-relevant information?
 
-This part focuses on the experiment conducted in the **Experiment_ROI.ipynb** notebook. The structure of the main pipeline is applied to train region specific models. Each model is trained on a reduced subsets of voxels corresponding to different parts of the visual cortex.
+This part focuses on the experiment conducted in the `Experiment_ROI.ipynb` notebook. The structure of the main pipeline is applied to train region specific models. Each model is trained on a reduced subsets of voxels corresponding to different parts of the visual cortex.
 
 Labels for each voxel are provided, which anables to construct the following masks (dark parts correspond to the removed voxels):
 
@@ -197,7 +197,7 @@ Corresponding parts of the brain (figure obtained with nilearn):
 <img src="docs/roi_brain_localisation.png" width="350"/>
 
 #### Reconstructions :
-Reconstructions obtained for each part of the visual cortex can be found under the name **reconstructions_ROI_{roi_name}.png**
+Reconstructions obtained for each part of the visual cortex can be found under the name `reconstructions_ROI_{roi_name}.png`
 
 #### Performances :
 
@@ -225,6 +225,75 @@ This time, models are trained on three different dataset sizes (600, 800 and 100
 
 ![exp datasize](results/data_size_experiment/datasize_supervised_vs_selfsupervised.png)
 
-Even if the difference of obtained score isn't always impressive, the models that are trained with self-supervision consistently obtain better results than the models without. This shows that self-supervision is an effective way to compensate for data scarcity. Notably, the self-supervised 2-way accuracy decrease is slower than the only supervised one.
+Even if the difference of obtained score isn't always impressive, the models that are trained with self-supervision consistently obtain better results than the models without. This shows that self-supervision is an effective way to compensate for data scarcity (up to a certain point).
 
 ![example](docs/ss_vs_os_example.png)
+
+---
+## Conclusion of the project:
+
+Even if the pipeline to reconstruct images does not permit to obtain as faithful reconstrcutions as what later models or even Beliy et al. have achieved, it has shown three things:
+- Retrieving meaningful spatial and color information from fMRI is possible, even with a simple Encoder-Decoder architecture. 
+- Lower parts of the visual cortex are more useful and higher parts may even degrade the reconstruction.
+- Self-supervision improves results when the dataset is too small to effectively cover the scope of natural images.
+
+On a more personal standpoint, this course was a very interesting way to learn about good pratices for reproduceable science and how to use new tools. It allowed me to become more familiar with deep learning and model implementation and training. I found it particularly enjoyable to learn about the brain and how to analyze my results regarding the different parts of the visual cortex.
+
+---
+## Setup and usage
+
+### Requirements
+
+```bash
+conda create -n fmri_reconstruction python=3.11
+conda activate fmri_reconstruction
+pip install -r requirements.txt
+```
+Pytorch may need special care:
+```bash
+# CPU only
+pip install torch torchvision
+
+# GPU CUDA 11.8
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
+
+# GPU CUDA 12.1
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+
+```
+### Data
+1. `Subject1.mat` is downloaded automatically in cell 3 of `fmri_to_image_pipeline.ipynb`
+2. Stimulus images: request from https://forms.gle/ujvA34948Xg49jdn9, place `images_passwd.zip` at the repo root
+3. TinyImageNet is downloaded automatically
+
+### Running
+
+Notebooks are designed to run from the repository root, locally or on Google Colab. All paths are relative. Run in order:
+
+1. `fmri_to_image_pipeline.ipynb` : full pipeline
+2. `experiment_roi.ipynb` : ROI analysis
+3. `experiment_dataset_size.ipynb` : dataset size analysis
+
+### GPU
+
+Training requires a GPU (~30-40 per model with a GPU T4)
+
+---
+
+## References
+
+**Main paper**
+
+Beliy R., Gaziv G., Hoogi A., Strappini F., Golan T., Irani M. (2019). From voxels to pixels and back: Self-supervision in natural-image reconstruction from fMRI. https://arxiv.org/abs/1907.02431
+
+**Dataset**
+
+Horikawa T. & Kamitani Y. (2017). Generic decoding of seen and imagined objects using hierarchical visual features. https://doi.org/10.1038/ncomms15037
+
+**Related work**
+
+Scotti P. et al. (2023). Reconstructing the Mind's Eye: fMRI-to-Image with Contrastive Learning and Diffusion Priors.
+
+Rombach R. et al. (2022). High-Resolution Image Synthesis with Latent Diffusion Models.
+
+Beliy et al. (2026) Brain-IT: image reconstruction from fMRI via Brain-interaction transformer. 
