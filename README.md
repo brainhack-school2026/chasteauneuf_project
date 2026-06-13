@@ -245,7 +245,13 @@ On a more personal standpoint, this course was a very interesting way to learn a
 ---
 ## Setup and usage
 
+```bash
+git clone https://github.com/brainhack-school2026/chasteauneuf_project.git
+cd chasteaueuf_project
+```
+
 ### Requirements
+
 
 ```bash
 conda create -n fmri_reconstruction python=3.11
@@ -274,7 +280,7 @@ pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
 Notebooks are designed to run from the repository root, locally or on Google Colab. All paths are relative. Notebooks can be run independently:
 
 1. `fmri_to_image_pipeline.ipynb` : full pipeline
-2. `experiment_roi.ipynb` : ROI analysis
+2. `Experiment_ROI.ipynb` : ROI analysis
 3. `experiment_dataset_size.ipynb` : dataset size analysis
 
 ### GPU
